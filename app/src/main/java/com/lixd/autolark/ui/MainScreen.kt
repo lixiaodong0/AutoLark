@@ -37,21 +37,17 @@ fun MainScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMod
 
     Box(modifier = modifier) {
         Column {
-            Column(Modifier.padding(16.dp)) {
-                Text("使用说明：", fontSize = 16.sp)
-                Text(
-                    "1.下载飞书，飞书并且开启急速上下班打卡功能。",
-                    fontSize = 12.sp
-                )
-                Text(
-                    "2.为了保障软件正常运行，软件需要开启《悬浮窗》权限，《后台弹出界面》权限。用来APP置为后台的情况下，用来拉起APP。",
-                    fontSize = 12.sp
-                )
-                Text(
-                    "3.按需配置上下班时间，调整打卡时间，点击运行。将自动运行打卡任务。",
-                    fontSize = 12.sp
-                )
-            }
+            DescriptionContainer(onClickDownload = {
+
+            }, onClickConfig = {
+
+            }, onClickFloatPermission = {
+
+            }, onClickBackgroundPermission = {
+
+            })
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp), thickness = 1.dp)
+
             WorkTimeContainer(uiState.startTime, uiState.endTime, onClickStartTime = {
                 showTimePickerDialog =
                     TimePickerDialogState.Show(TimePickerType.StartTime, uiState.startTime)
