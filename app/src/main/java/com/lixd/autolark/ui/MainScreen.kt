@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,22 +48,34 @@ fun MainScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMod
 
             })
             HorizontalDivider(Modifier.padding(horizontal = 16.dp), thickness = 1.dp)
-
-            WorkTimeContainer(uiState.startTime, uiState.endTime, onClickStartTime = {
-                showTimePickerDialog =
-                    TimePickerDialogState.Show(TimePickerType.StartTime, uiState.startTime)
-            }, onClickEndTime = {
-                showTimePickerDialog =
-                    TimePickerDialogState.Show(TimePickerType.EndTime, uiState.endTime)
-            })
-            HorizontalDivider(Modifier.padding(horizontal = 16.dp), thickness = 2.dp)
-            OpenCardTimeContainer(uiState.startMinute, uiState.endMinute, onClickStartMinute = {
-                showMinutePickerDialog =
-                    MinutePickerDialogState.Show(MinutePickerType.StartMinute(it))
-            }, onClickEndMinute = {
-                showMinutePickerDialog =
-                    MinutePickerDialogState.Show(MinutePickerType.EndMinute(it))
-            })
+            Spacer(Modifier.size(20.dp))
+            WorkTimeContainer(
+                "上班时间",
+                workTime = uiState.startTime,
+                minute = uiState.startMinute,
+                punchInTime = uiState.outStartTimeStr,
+                onClickWorkTime = {
+                    showTimePickerDialog =
+                        TimePickerDialogState.Show(TimePickerType.StartTime, it)
+                },
+                onClickMinute = {
+                    showMinutePickerDialog =
+                        MinutePickerDialogState.Show(MinutePickerType.StartMinute(it))
+                })
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp), thickness = 1.dp)
+            WorkTimeContainer(
+                "下班时间",
+                workTime = uiState.endTime,
+                minute = uiState.endMinute,
+                punchInTime = uiState.outEndTimeStr,
+                onClickWorkTime = {
+                    showTimePickerDialog =
+                        TimePickerDialogState.Show(TimePickerType.EndTime, it)
+                },
+                onClickMinute = {
+                    showMinutePickerDialog =
+                        MinutePickerDialogState.Show(MinutePickerType.EndMinute(it))
+                })
             Spacer(Modifier.size(30.dp))
             RunningButton(uiState.isRunning, onRunning = {
                 viewModel.handleIntent(MainUiIntent.Start)

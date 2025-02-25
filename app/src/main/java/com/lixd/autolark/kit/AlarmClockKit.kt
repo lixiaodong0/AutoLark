@@ -19,9 +19,10 @@ class AlarmClockKit private constructor() {
     fun setAlarmClock(
         calendar: Calendar,
         extra: Intent.() -> Unit = {},
+        cls: Class<*>? = null,
         intentRequestCode: Int = 0
     ) {
-        val pendingIntent = Intent(application, AlarmClockReceiver::class.java).apply {
+        val pendingIntent = Intent(application, cls).apply {
             extra()
         }.let {
             PendingIntent.getBroadcast(application, intentRequestCode, it, FLAG_MUTABLE)
@@ -34,8 +35,8 @@ class AlarmClockKit private constructor() {
         )
     }
 
-    fun cancelAlarmClock(intentRequestCode: Int = 0) {
-        val pendingIntent = Intent(application, AlarmClockReceiver::class.java).let {
+    fun cancelAlarmClock(cls: Class<*>? = null, intentRequestCode: Int = 0) {
+        val pendingIntent = Intent(application, cls).let {
             PendingIntent.getBroadcast(application, intentRequestCode, it, FLAG_MUTABLE)
         }
         alarmManager.cancel(pendingIntent)

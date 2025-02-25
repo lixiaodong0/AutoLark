@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        MainViewModel.provider = viewModel
         enableEdgeToEdge()
         startService(Intent(this, MyForegroundService::class.java))
         setContent {

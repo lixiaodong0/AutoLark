@@ -19,82 +19,85 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lixd.autolark.conf.WorkTime
+import com.lixd.autolark.conf.toTimeStr
 import com.lixd.autolark.ui.theme.SmallNumberSize
 import com.lixd.autolark.ui.theme.SmallNumberTextSize
 
 @Composable
 fun WorkTimeContainer(
-    startTime: WorkTime,
-    endTime: WorkTime,
-    onClickStartTime: () -> Unit,
-    onClickEndTime: () -> Unit
+    title: String,
+    subtitle: String = "打卡时间",
+    workTime: WorkTime,
+    minute: Int,
+    punchInTime: String,
+    onClickWorkTime: (WorkTime) -> Unit,
+    onClickMinute: (Int) -> Unit
 ) {
     Column(
         Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text("上班时间")
-        Spacer(Modifier.size(10.dp))
-        Box(modifier = Modifier
-            .clickable {
-                onClickStartTime()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.weight(0.6f)) {
+                Column {
+                    Text(title)
+                    Spacer(Modifier.size(10.dp))
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onClickWorkTime(workTime)
+                            },
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TimeContent(workTime.toHourStr())
+                        Text(
+                            ":",
+                            fontSize = SmallNumberTextSize,
+                            modifier = Modifier.padding(horizontal = 12.dp)
+                        )
+                        TimeContent(workTime.toMinuteStr())
+                        Spacer(Modifier.size(10.dp))
+                        Icon(
+                            rememberVectorPainter(Icons.Default.KeyboardArrowRight),
+                            null,
+                        )
+                    }
+                }
             }
-            .padding(start = 16.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TimeContent(startTime.toHourStr())
-                Text(
-                    ":",
-                    fontSize = SmallNumberTextSize,
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                )
-                TimeContent(startTime.toMinuteStr())
+            Box(Modifier.weight(0.4f)) {
+                Column(Modifier.align(Alignment.Center)) {
+                    Text(subtitle)
+                    Spacer(Modifier.size(10.dp))
+                    Row(
+                        Modifier
+                            .clickable {
+                                onClickMinute(minute)
+                            },
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        MinuteContent(minute)
+                        Spacer(Modifier.size(4.dp))
+                        Text("/分钟", fontSize = 14.sp, color = Color.Gray)
+                        Spacer(Modifier.size(10.dp))
+                        Icon(
+                            rememberVectorPainter(Icons.Default.KeyboardArrowRight),
+                            null,
+                        )
+                    }
+                }
             }
-            Icon(
-                rememberVectorPainter(Icons.Default.KeyboardArrowRight),
-                null,
-                modifier = Modifier.align(
-                    Alignment.CenterEnd
-                )
-            )
         }
-        Spacer(Modifier.size(16.dp))
-        Text("下班时间")
-        Spacer(Modifier.size(10.dp))
-        Box(modifier = Modifier
-            .clickable {
-                onClickEndTime()
-            }
-            .padding(start = 16.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TimeContent(endTime.toHourStr())
-                Text(
-                    ":",
-                    fontSize = SmallNumberTextSize,
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                )
-                TimeContent(endTime.toMinuteStr())
-            }
-            Icon(
-                rememberVectorPainter(Icons.Default.KeyboardArrowRight),
-                null,
-                modifier = Modifier.align(
-                    Alignment.CenterEnd
-                )
-            )
-        }
+        Spacer(Modifier.size(8.dp))
+        Text("预计：${punchInTime} 开始打卡", fontSize = 14.sp, color = Color.Gray)
     }
 }
 
@@ -109,6 +112,22 @@ private fun TimeContent(time: String) {
             Text(
                 fontSize = SmallNumberTextSize,
                 text = time,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MinuteContent(minute: Int) {
+    Surface(
+        modifier = SmallNumberSize,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                fontSize = SmallNumberTextSize,
+                text = minute.toTimeStr(),
             )
         }
     }

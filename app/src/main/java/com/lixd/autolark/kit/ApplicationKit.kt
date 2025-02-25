@@ -13,13 +13,33 @@ object ApplicationKit {
         launchApp(context, packageName)
     }
 
-    fun launchApp(context: Context = appContext, packageName: String = LARK_PACKAGE_NAME) {
+    fun toHome(context: Context = appContext): Boolean {
+        val intent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_HOME)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        try {
+            context.startActivity(intent)
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
+    }
+
+    fun launchApp(context: Context = appContext, packageName: String = LARK_PACKAGE_NAME): Boolean {
         val packageManager = context.packageManager
         val intent = packageManager.getLaunchIntentForPackage(packageName)
         if (intent != null) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
+            try {
+                context.startActivity(intent)
+                return true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+        return false
     }
 
     fun killApp(context: Context = appContext, packageName: String = LARK_PACKAGE_NAME) {
