@@ -1,6 +1,7 @@
 package com.lixd.autolark.ui
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -54,7 +55,12 @@ fun RunningButton(
                 Text("运行")
             }
         } else {
-            Box(modifier = Modifier.align(Alignment.Center), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier
+                .align(Alignment.Center)
+                .clickable {
+                    onStop()
+                }, contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(48.dp),
                     color = MaterialTheme.colorScheme.primaryContainer,

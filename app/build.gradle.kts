@@ -17,6 +17,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = File("${project.rootDir}/app/keystore.jks")
+            storePassword = "autolark123"
+            keyPassword = "autolark123"
+            keyAlias = "autolark123"
+        }
+    }
 
     buildTypes {
         release {
@@ -25,6 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
