@@ -88,29 +88,26 @@ fun DescriptionContainer(
         append("。用来APP置为后台的情况下，用来拉起APP。")
     }
 
+    val desc3 = buildAnnotatedString {
+        //3.部分手机限制APP后台运行的情况下，需要针对APP开启《白名单》保活权限，保证APP在后台持续运行。方式1：打开最近任务列表，找到当前APP，手指按住下滑，即可智能保活。方式2：参考白名单设置
+        append("3.部分手机限制APP后台运行的情况下，需要针对APP")
+        withStyle(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
+            append("开启《白名单》保活权限")
+        }
+        append("，保证APP在后台持续运行。\n")
+        append("方式1：打开最近任务列表，找到当前APP，手指按住下滑，即可智能保活。\n")
+        append("方式2：根据自己设备机型在浏览器搜索APP白名单保活相关设置。")
+    }
+
 
     Column(Modifier.padding(16.dp)) {
-        Text("软件介绍：", fontSize = 16.sp, color = Color.Black)
-        Text(
-            buildAnnotatedString {
-                //这是一款针对飞书极速打卡功能的自动化唤醒程序，配置上下班时间，即可在指定时间段唤醒飞书，从而实现自动打卡功能。
-                append("这是一款针对")
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                    append("飞书极速打卡功能的自动化唤醒程序")
-                }
-                append("，配置上下班时间，即可在指定时间段唤醒飞书，从而实现")
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                    append("自动打卡")
-                }
-                append("功能。")
-            },
-            fontSize = 12.sp,
-            lineHeight = 24.sp,
-            color = Color.Gray
-        )
-        Spacer(Modifier.size(10.dp))
         Text("使用说明：", fontSize = 16.sp, color = Color.Black)
-        Spacer(Modifier.size(4.dp))
+        Spacer(Modifier.size(8.dp))
         ClickableText(
             desc1,
             style = TextStyle(
@@ -131,7 +128,7 @@ fun DescriptionContainer(
                     }
             },
         )
-        Spacer(Modifier.size(4.dp))
+        Spacer(Modifier.size(8.dp))
         ClickableText(
             desc2,
             style = TextStyle(
@@ -152,9 +149,21 @@ fun DescriptionContainer(
                     }
             },
         )
-        Spacer(Modifier.size(4.dp))
+        Spacer(Modifier.size(8.dp))
+        ClickableText(
+            desc3,
+            style = TextStyle(
+                lineHeight = 24.sp,
+                fontSize = 12.sp,
+                color = Color.Gray,
+            ),
+            onClick = { offset ->
+
+            },
+        )
+        Spacer(Modifier.size(8.dp))
         Text(
-            "3.配置上下班时间，打卡时间，点击运行，自动运行打卡任务。",
+            "4.配置上下班时间，打卡时间，点击运行，自动运行打卡任务。",
             fontSize = 12.sp,
             lineHeight = 24.sp,
             color = Color.Gray

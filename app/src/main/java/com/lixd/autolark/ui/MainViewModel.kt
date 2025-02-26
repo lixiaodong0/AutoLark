@@ -1,25 +1,48 @@
 package com.lixd.autolark.ui
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lixd.autolark.MainActivity
 import com.lixd.autolark.conf.WorkTime
 import com.lixd.autolark.kit.ApplicationKit
 import com.lixd.autolark.kit.DateKit
+import com.lixd.autolark.kit.SimpleCacheKit
+import com.lixd.autolark.kit.SimpleCacheKit.Companion.KEY_END_WORK_TIME
+import com.lixd.autolark.kit.SimpleCacheKit.Companion.KEY_START_WORK_TIME
+import com.lixd.autolark.kit.SimpleCacheKit.Companion.KEY_TRACELESS_MODE
 import com.lixd.autolark.kit.ToastKit
 import com.lixd.autolark.task.AlarmClockTaskManager
 import com.lixd.autolark.task.TaskData
 import com.lixd.autolark.task.WakeAppTaskManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
     private val _mainUiState = MutableStateFlow(MainUiState())
     val mainUiState = _mainUiState.asStateFlow()
 
     init {
+        val checked = SimpleCacheKit.instance.getBool(KEY_TRACELESS_MODE)
+        val start = SimpleCacheKit.instance.getTaskData(KEY_START_WORK_TIME)
+        val end = SimpleCacheKit.instance.getTaskData(KEY_END_WORK_TIME)
+        _mainUiState.update {
+            it.copy(
+                checked = checked,
+                startTime = start?.workTime ?: WorkTime(10, 0),
+                startMinute = start?.minute ?: 20,
+                endTime = end?.workTime ?: WorkTime(19, 30),
+                endMinute = end?.minute ?: 1,
+            )
+        }
         calculatePunchInTime()
     }
 
@@ -73,6 +96,14 @@ class MainViewModel : ViewModel() {
 
 
             MainUiIntent.Start -> {
+                if (!ApplicationKit.isAppInstalled()) {
+                    ToastKit.showToast("飞书未安装，请阅读使用说明")
+                    return
+                }
+                if (!ApplicationKit.checkOverlayPermissionSettings()) {
+                    ToastKit.showToast("悬浮窗权限未开启，请阅读使用说明")
+                    return
+                }
                 _mainUiState.update {
                     it.copy(
                         isRunning = true
@@ -81,6 +112,11 @@ class MainViewModel : ViewModel() {
                 val startTaskData = _mainUiState.value.toStartTaskData()
                 val endTaskData = _mainUiState.value.toEndTaskData()
                 AlarmClockTaskManager.instance.start(startTaskData, endTaskData)
+                ApplicationKit.toHome()
+                viewModelScope.launch {
+                    SimpleCacheKit.instance.putTaskData(KEY_START_WORK_TIME, startTaskData)
+                    SimpleCacheKit.instance.putTaskData(KEY_END_WORK_TIME, endTaskData)
+                }
             }
 
             MainUiIntent.Stop -> {
@@ -118,6 +154,31 @@ class MainViewModel : ViewModel() {
 
             MainUiIntent.OpenFloatPermission -> {
                 ApplicationKit.openOverlayPermissionSettings()
+            }
+
+            is MainUiIntent.ModifyTracelessMode -> {
+                viewModelScope.launch {
+                    var isTracelessMode = false
+                    if (intent.checked) {
+                        SimpleCacheKit.instance.putBool(KEY_TRACELESS_MODE, false)
+                        isTracelessMode = false
+                    } else {
+                        SimpleCacheKit.instance.putBool(KEY_TRACELESS_MODE, true)
+                        isTracelessMode = true
+                    }
+                    delay(200)
+                    withContext(Dispatchers.Main) {
+                        val activity = intent.activityContext as? Activity
+                        activity?.let {
+                            it.finish()
+                            ApplicationKit.launchTracelessModeActivity(
+                                isTracelessMode,
+                                MainActivity::class.java,
+                                it
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -186,6 +247,9 @@ sealed class MainUiIntent {
     data object Config : MainUiIntent()
     data object OpenFloatPermission : MainUiIntent()
     data object OpenBackgroundPermission : MainUiIntent()
+    data class ModifyTracelessMode(val checked: Boolean, val activityContext: Context) :
+        MainUiIntent()
+
     data object Start : MainUiIntent()
     data object Stop : MainUiIntent()
 }
@@ -197,6 +261,7 @@ data class MainUiState(
     val endMinute: Int = 1,
     val outStartTimeStr: String = "",
     val outEndTimeStr: String = "",
+    val checked: Boolean = false,
     val isRunning: Boolean = false,
 ) {
     fun toStartTaskData(): TaskData {
