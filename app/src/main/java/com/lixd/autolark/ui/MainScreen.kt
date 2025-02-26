@@ -39,13 +39,13 @@ fun MainScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMod
     Box(modifier = modifier) {
         Column {
             DescriptionContainer(onClickDownload = {
-
+                viewModel.handleIntent(MainUiIntent.Download)
             }, onClickConfig = {
-
+                viewModel.handleIntent(MainUiIntent.Config)
             }, onClickFloatPermission = {
-
+                viewModel.handleIntent(MainUiIntent.OpenFloatPermission)
             }, onClickBackgroundPermission = {
-
+                viewModel.handleIntent(MainUiIntent.OpenBackgroundPermission)
             })
             HorizontalDivider(Modifier.padding(horizontal = 16.dp), thickness = 1.dp)
             Spacer(Modifier.size(20.dp))

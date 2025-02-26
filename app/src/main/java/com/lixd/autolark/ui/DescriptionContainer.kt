@@ -123,10 +123,10 @@ fun DescriptionContainer(
                     .firstOrNull()?.let {
                         if (it.item == "downloadLark") {
                             //下载
-                            ToastKit.showToast("下载")
+                            onClickDownload()
                         } else if (it.item == "configLark") {
                             //配置
-                            ToastKit.showToast("配置")
+                            onClickConfig()
                         }
                     }
             },
@@ -144,10 +144,10 @@ fun DescriptionContainer(
                     .firstOrNull()?.let {
                         if (it.item == "openFloatPermission") {
                             //下载
-                            ToastKit.showToast("打开悬浮权限")
+                            onClickFloatPermission()
                         } else if (it.item == "openBackgroundPermission") {
                             //配置
-                            ToastKit.showToast("打开后台弹出权限")
+                            onClickBackgroundPermission()
                         }
                     }
             },

@@ -3,6 +3,9 @@ package com.lixd.autolark.kit
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import com.lixd.autolark.conf.LARK_PACKAGE_NAME
 
 object ApplicationKit {
@@ -46,5 +49,44 @@ object ApplicationKit {
         val activityManager =
             context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.killBackgroundProcesses(packageName)
+    }
+
+    fun isAppInstalled(
+        context: Context = appContext,
+        packageName: String = LARK_PACKAGE_NAME
+    ): Boolean {
+        return try {
+            context.packageManager.getPackageInfo(packageName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    fun toMarket(
+        context: Context = appContext,
+        packageName: String = LARK_PACKAGE_NAME
+    ) {
+        val uri = Uri.parse("market://details?id=$packageName")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    }
+
+    fun checkOverlayPermissionSettings() = Settings.canDrawOverlays(appContext)
+
+    fun openOverlayPermissionSettings() {
+        val intent = Intent(
+            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:" + appContext.packageName)
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        appContext.startActivity(intent)
+    }
+
+    fun openAppPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,  Uri.parse("package:" + appContext.packageName))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        appContext.startActivity(intent)
     }
 }

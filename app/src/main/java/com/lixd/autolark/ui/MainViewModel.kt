@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lixd.autolark.conf.WorkTime
+import com.lixd.autolark.kit.ApplicationKit
 import com.lixd.autolark.kit.DateKit
+import com.lixd.autolark.kit.ToastKit
 import com.lixd.autolark.task.AlarmClockTaskManager
 import com.lixd.autolark.task.TaskData
 import com.lixd.autolark.task.WakeAppTaskManager
@@ -90,6 +92,33 @@ class MainViewModel : ViewModel() {
                 WakeAppTaskManager.instance.stopTask()
                 AlarmClockTaskManager.instance.stop()
             }
+
+            MainUiIntent.Config -> {
+                if (ApplicationKit.isAppInstalled()) {
+                    ToastKit.showToast("请检查飞书配置极速打卡已开启")
+                    ApplicationKit.launchApp()
+                } else {
+                    ApplicationKit.toMarket()
+                    ToastKit.showToast("请先下载并安装飞书")
+                }
+            }
+
+            MainUiIntent.Download -> {
+                if (ApplicationKit.isAppInstalled()) {
+                    ToastKit.showToast("飞书已安装")
+                } else {
+                    ApplicationKit.toMarket()
+                    ToastKit.showToast("请先下载并安装飞书")
+                }
+            }
+
+            MainUiIntent.OpenBackgroundPermission -> {
+                ApplicationKit.openAppPermissionSettings()
+            }
+
+            MainUiIntent.OpenFloatPermission -> {
+                ApplicationKit.openOverlayPermissionSettings()
+            }
         }
 
     }
@@ -135,7 +164,7 @@ class MainViewModel : ViewModel() {
             return false
         }
 
-        fun restartEndWorkAlarmClock() : Boolean {
+        fun restartEndWorkAlarmClock(): Boolean {
             if (::provider.isInitialized) {
                 val taskData = provider.mainUiState.value.toEndTaskData()
                 AlarmClockTaskManager.instance.appendEndWorkAlarmClock(taskData)
@@ -153,6 +182,10 @@ sealed class MainUiIntent {
     data class UpdateStartMinute(val minute: Int) : MainUiIntent()
     data class UpdateEndMinute(val minute: Int) : MainUiIntent()
     data object CalculatePunchInTime : MainUiIntent()
+    data object Download : MainUiIntent()
+    data object Config : MainUiIntent()
+    data object OpenFloatPermission : MainUiIntent()
+    data object OpenBackgroundPermission : MainUiIntent()
     data object Start : MainUiIntent()
     data object Stop : MainUiIntent()
 }
