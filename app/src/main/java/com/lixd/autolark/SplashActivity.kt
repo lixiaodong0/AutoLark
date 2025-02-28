@@ -1,5 +1,6 @@
 package com.lixd.autolark
 
+import android.app.ActivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,10 +14,6 @@ class SplashActivity : ComponentActivity() {
         val isTracelessMode = SimpleCacheKit.instance.getBool(KEY_TRACELESS_MODE)
         //优先关闭，只保留MainActivity在根栈，否则动态修改excludeFromRecents配置无效。
         finish()
-        ApplicationKit.launchTracelessModeActivity(
-            isTracelessMode,
-            MainActivity::class.java,
-            this
-        )
+
     }
 }

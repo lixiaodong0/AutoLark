@@ -27,7 +27,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.system.exitProcess
+import com.lixd.autolark.kit.ApplicationKit
 
 @Composable
 fun DrawerContent(uiState: MainUiState, viewModel: MainViewModel) {
@@ -86,7 +86,7 @@ fun DrawerContent(uiState: MainUiState, viewModel: MainViewModel) {
                 }, modifier = Modifier.align(Alignment.CenterEnd))
             }
             Text(
-                "开启后，APP处于后台情况下，最近任务栏将不会出现该APP。注意：每次修改此配置将会重启程序。",
+                "开启后，APP处于后台情况下，最近任务栏将不会出现该APP。",
                 fontSize = 12.sp,
                 color = Color.Gray,
             )
@@ -94,8 +94,7 @@ fun DrawerContent(uiState: MainUiState, viewModel: MainViewModel) {
             Spacer(Modifier.weight(1f))
             Button(
                 {
-                    android.os.Process.killProcess(android.os.Process.myPid())
-                    exitProcess(10)
+                    ApplicationKit.exit()
                 }, modifier = Modifier
                     .padding(bottom = 16.dp)
                     .fillMaxWidth()

@@ -17,6 +17,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
+import com.lixd.autolark.kit.ApplicationKit
+import com.lixd.autolark.kit.SimpleCacheKit
+import com.lixd.autolark.kit.SimpleCacheKit.Companion.KEY_TRACELESS_MODE
 
 import com.lixd.autolark.ui.DrawerContent
 import com.lixd.autolark.ui.MainScreen
@@ -32,6 +36,7 @@ class MainActivity : ComponentActivity() {
         MainViewModel.provider = viewModel
         enableEdgeToEdge()
         startService(Intent(this, MyForegroundService::class.java))
+
         setContent {
             AutoLarkTheme {
 
@@ -62,6 +67,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        val isTracelessMode = SimpleCacheKit.instance.getBool(KEY_TRACELESS_MODE)
+        ApplicationKit.setExcludeFromRecents(isTracelessMode)
+    }
+
+    override fun onDestroy() {
+        stopService(Intent(this, MyForegroundService::class.java))
+        super.onDestroy()
     }
 }
 

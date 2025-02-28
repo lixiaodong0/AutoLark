@@ -171,18 +171,24 @@ class MainViewModel : ViewModel() {
                         SimpleCacheKit.instance.putBool(KEY_TRACELESS_MODE, true)
                         isTracelessMode = true
                     }
-                    delay(200)
-                    withContext(Dispatchers.Main) {
-                        val activity = intent.activityContext as? Activity
-                        activity?.let {
-                            it.finish()
-                            ApplicationKit.launchTracelessModeActivity(
-                                isTracelessMode,
-                                MainActivity::class.java,
-                                it
-                            )
-                        }
+                    ApplicationKit.setExcludeFromRecents(isTracelessMode)
+                    _mainUiState.update {
+                        it.copy(
+                            checked = isTracelessMode
+                        )
                     }
+//                    delay(200)
+//                    withContext(Dispatchers.Main) {
+//                        val activity = intent.activityContext as? Activity
+//                        activity?.let {
+//                            it.finish()
+//                            ApplicationKit.launchTracelessModeActivity(
+//                                isTracelessMode,
+//                                MainActivity::class.java,
+//                                it
+//                            )
+//                        }
+//                    }
                 }
             }
         }

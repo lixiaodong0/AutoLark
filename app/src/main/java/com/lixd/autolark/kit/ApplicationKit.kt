@@ -7,16 +7,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.ComponentActivity.ACTIVITY_SERVICE
 import com.lixd.autolark.MainActivity
 import com.lixd.autolark.conf.LARK_PACKAGE_NAME
 
 object ApplicationKit {
     lateinit var appContext: Context
 
-    fun restartApp(context: Context = appContext, packageName: String = LARK_PACKAGE_NAME) {
-        killApp(context, packageName)
-        launchApp(context, packageName)
-    }
 
     fun toHome(context: Context = appContext): Boolean {
         val intent = Intent(Intent.ACTION_MAIN).apply {
@@ -108,16 +105,25 @@ object ApplicationKit {
         appContext.startActivity(intent)
     }
 
-    fun launchTracelessModeActivity(
-        isTracelessMode: Boolean = true,
-        clazz: Class<*>,
-        activityContext: Context
-    ) {
-        val intent = Intent(activityContext, clazz).apply {
-            if (isTracelessMode) {
-                addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-            }
+
+    fun exit() {
+        val activityManager = appContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        activityManager.appTasks.forEach {
+            it.finishAndRemoveTask()
         }
-        activityContext.startActivity(intent)
+    }
+
+    fun setExcludeFromRecents(isTracelessMode: Boolean = true) {
+        val activityManager = appContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        activityManager.appTasks.forEach {
+            it.setExcludeFromRecents(isTracelessMode)
+        }
+    }
+
+    fun moveToFront() {
+        val activityManager = appContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        activityManager.appTasks.forEach {
+            it.moveToFront()
+        }
     }
 }

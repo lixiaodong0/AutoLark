@@ -23,7 +23,7 @@ class WakeAppTaskManager private constructor() {
         stopTask()
         runningTask = GlobalScope.launch(Dispatchers.IO) {
             Log.d("WakeAppTaskManager", "------Wake App Task Start----")
-            ApplicationKit.launchApp(packageName = ApplicationKit.appContext.packageName)
+            ApplicationKit.moveToFront()
             for (i in 0 until DEFAULT_MAX_WAKE_COUNT) {
                 Log.d("WakeAppTaskManager", "${i + 1} kill app wait 3s launch app")
                 //1.杀死飞书APP
@@ -42,7 +42,7 @@ class WakeAppTaskManager private constructor() {
                 Log.d("WakeAppTaskManager", "${i + 1} launch my app wait 3s")
                 //5.为了确保下一次能够正常执行，需要把我们自己APP进程拉到前台，因为killApp只能杀死后台进程
                 withContext(Dispatchers.Main) {
-                    ApplicationKit.launchApp(packageName = ApplicationKit.appContext.packageName)
+                    ApplicationKit.moveToFront()
                 }
                 delay(3000)
             }
