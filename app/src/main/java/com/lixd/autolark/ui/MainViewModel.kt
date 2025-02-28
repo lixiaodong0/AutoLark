@@ -111,7 +111,8 @@ class MainViewModel : ViewModel() {
                 }
                 _mainUiState.update {
                     it.copy(
-                        isRunning = true
+                        isRunning = true,
+                        startRunningTime = System.currentTimeMillis()
                     )
                 }
                 viewModelScope.launch {
@@ -123,7 +124,8 @@ class MainViewModel : ViewModel() {
             MainUiIntent.Stop -> {
                 _mainUiState.update {
                     it.copy(
-                        isRunning = false
+                        isRunning = false,
+                        startRunningTime = 0
                     )
                 }
                 WakeAppTaskManager.instance.stopTask()
@@ -177,18 +179,6 @@ class MainViewModel : ViewModel() {
                             checked = isTracelessMode
                         )
                     }
-//                    delay(200)
-//                    withContext(Dispatchers.Main) {
-//                        val activity = intent.activityContext as? Activity
-//                        activity?.let {
-//                            it.finish()
-//                            ApplicationKit.launchTracelessModeActivity(
-//                                isTracelessMode,
-//                                MainActivity::class.java,
-//                                it
-//                            )
-//                        }
-//                    }
                 }
             }
         }
@@ -274,6 +264,7 @@ data class MainUiState(
     val outEndTimeStr: String = "",
     val checked: Boolean = false,
     val isRunning: Boolean = false,
+    val startRunningTime: Long = 0L,
 ) {
     fun toStartTaskData(): TaskData {
         return TaskData(startTime, startMinute)

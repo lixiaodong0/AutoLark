@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -44,13 +46,14 @@ fun Long.formatDuration(): String {
 
 @Composable
 fun RunningScreen(viewModel: MainViewModel) {
+    val uiState by viewModel.mainUiState.collectAsState()
     var time by remember {
         mutableLongStateOf(0L)
     }
     LaunchedEffect(Unit) {
-        launch {
+        launch(Dispatchers.IO) {
             while (isActive) {
-                time++
+                time = (System.currentTimeMillis() - uiState.startRunningTime) / 1000
                 delay(1000)
             }
         }
