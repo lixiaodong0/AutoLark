@@ -10,6 +10,8 @@ object DateKit {
     @SuppressLint("ConstantLocale")
     private val dateFormat: SimpleDateFormat =
         SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private val timeFormat: SimpleDateFormat =
+        SimpleDateFormat("HH:mm:ss", Locale.getDefault())
 
     fun calculatePunchInTime(
         hour: Int, minute: Int,
@@ -38,7 +40,19 @@ object DateKit {
         hour: Int, minute: Int,
         punchInMinute: Int,
     ): String {
-        val time = calculatePunchInTime(hour, minute, punchInMinute)
-        return dateFormat.format(time.time)
+        val now = Calendar.getInstance()
+        val next = calculatePunchInTime(hour, minute, punchInMinute)
+        return if (isSameDay(now, next)) {
+            "今天 ${timeFormat.format(next.time)}"
+        } else {
+            "明天 ${timeFormat.format(next.time)}"
+        }
+    }
+
+
+    fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
+                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
     }
 }

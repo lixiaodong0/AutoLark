@@ -2,8 +2,6 @@ package com.lixd.autolark.ui
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lixd.autolark.MainActivity
@@ -104,18 +102,21 @@ class MainViewModel : ViewModel() {
                     ToastKit.showToast("悬浮窗权限未开启，请阅读使用说明")
                     return
                 }
+                val startTaskData = _mainUiState.value.toStartTaskData()
+                val endTaskData = _mainUiState.value.toEndTaskData()
+                AlarmClockTaskManager.instance.start(startTaskData, endTaskData)
+                viewModelScope.launch {
+                    SimpleCacheKit.instance.putTaskData(KEY_START_WORK_TIME, startTaskData)
+                    SimpleCacheKit.instance.putTaskData(KEY_END_WORK_TIME, endTaskData)
+                }
                 _mainUiState.update {
                     it.copy(
                         isRunning = true
                     )
                 }
-                val startTaskData = _mainUiState.value.toStartTaskData()
-                val endTaskData = _mainUiState.value.toEndTaskData()
-                AlarmClockTaskManager.instance.start(startTaskData, endTaskData)
-                ApplicationKit.toHome()
                 viewModelScope.launch {
-                    SimpleCacheKit.instance.putTaskData(KEY_START_WORK_TIME, startTaskData)
-                    SimpleCacheKit.instance.putTaskData(KEY_END_WORK_TIME, endTaskData)
+                    delay(500)
+                    ApplicationKit.toHome()
                 }
             }
 
@@ -157,6 +158,10 @@ class MainViewModel : ViewModel() {
             }
 
             is MainUiIntent.ModifyTracelessMode -> {
+                if (_mainUiState.value.isRunning) {
+                    ToastKit.showToast("任务运行中，请先停止任务")
+                    return
+                }
                 viewModelScope.launch {
                     var isTracelessMode = false
                     if (intent.checked) {
